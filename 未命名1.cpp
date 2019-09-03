@@ -1,75 +1,137 @@
 #include <iostream>
 #include <stdlib.h>
-#include <time.h>
+#include <ctime>
 #include <vector>
 #include <algorithm>
 using namespace std;
 
 vector<int>num;
-
-int id[10000];//¼Ù¶¨0-99Îª×îÉÏÃæÒ»ĞĞ£¬9900-9999Îª×îºóÒ»ĞĞ 
-int tf[10000];//ÊÇ·ñÉøÍ¸ 
+int g_is_first = 1; 
+int id[100];//å‡å®š0-9ä¸ºæœ€ä¸Šé¢ä¸€è¡Œï¼Œ90-99ä¸ºæœ€åä¸€è¡Œ 
+int tf[100];//æ˜¯å¦æ¸—é€ 
 void init(){
-	for(int i=0;i<10000;i++){
+	cout<<"init"<<endl;
+	for(int i=0;i<100;i++){
 		id[i]=i; tf[i]=0;
 	}
+	for(int i=0;i<10;i++)id[i]=0;
 }
 int find(int p){
 	while(p!=id[p])p=id[p];
 	return p;
 }
-void weighted-QU(int p){   
+bool cmp(int p,int q){
+	return (id[p]<id[q]);
+}
+void weightedQU(int p){ 
+	cout<<"weight"<<endl;  
 	int pRoot=find(p);
-	if(pRoot<100){
-		int p1Root=find(pRoot+100);
-		id[p1Root]=pRoot;
+	if(pRoot<10){
+		if(tf[pRoot]==1){
+			int p1Root=find(pRoot+10);
+			id[p1Root]=0;
+		}
 	}
-    else if(pRoot>=9900){
-    	int p1Root=find(pRoot-100);
-    	id[pRoot]=p1Root;
+    else if(pRoot>=90){
+    	if(tf[pRoot-10]){
+    		int p1Root=find(pRoot-10);
+    		id[pRoot]=p1Root;
+		}	
 	}
-	else if(pRoot%100==0){
-		int p1Root=find(pRoot+1), p2Root=find(pRoot+100),
-			p3Root=find(pRoot-100),m;
-		m=min(p1Root,p2Root);
-		m=min(pRoot,m);m=min(p3Root,m);
-		
+	else if(pRoot%10==0){
+		vector<int>tmp;
+		if(tf[pRoot+1])tmp.push_back(pRoot+1);
+		if(tf[pRoot+10])tmp.push_back(pRoot+10);
+		if(tf[pRoot-10])tmp.push_back(pRoot-10);
+		if(tmp.size()!=0){
+			if(tmp.size()==1)
+				(id[tmp[0]]<pRoot) ? (pRoot=tmp[0]) : (id[tmp[0]]=pRoot);
+			else{
+				sort(tmp.begin(),tmp.end(),cmp);
+				for(int i=1;i<tmp.size();i++)
+					id[tmp[i]]=id[tmp[0]];
+			}
+		}
+	}
+	else if(pRoot%10==9){
+		vector<int>tmp;
+		if(tf[pRoot-1])tmp.push_back(pRoot-1);
+		if(tf[pRoot+10])tmp.push_back(pRoot+10);
+		if(tf[pRoot-10])tmp.push_back(pRoot-10);
+		if(tmp.size()!=0){
+			if(tmp.size()==1)
+				(id[tmp[0]]<pRoot) ? (pRoot=tmp[0]) : (id[tmp[0]]=pRoot);
+			else{
+				sort(tmp.begin(),tmp.end(),cmp);
+				for(int i=1;i<tmp.size();i++)
+					id[tmp[i]]=id[tmp[0]];
+			}
+		}
+	}
+	else{
+		vector<int>tmp;
+		if(tf[pRoot+1])tmp.push_back(pRoot+1);
+		if(tf[pRoot-1])tmp.push_back(pRoot-1);
+		if(tf[pRoot+10])tmp.push_back(pRoot+10);
+		if(tf[pRoot-10])tmp.push_back(pRoot-10);
+		if(tmp.size()!=0){
+			if(tmp.size()==1)
+				(id[tmp[0]]<pRoot) ? (pRoot=tmp[0]) : (id[tmp[0]]=pRoot);
+			else{
+				sort(tmp.begin(),tmp.end(),cmp);
+				for(int i=1;i<tmp.size();i++)
+					id[tmp[i]]=id[tmp[0]];
+			}
+		}
 	}
 }
 
 
 bool judgement(){
-	for(int i=9900;i<10000;i++){
-		if(id[i]<100)
-			return 0;
+	cout<<"judgement"<<endl;
+	for(int i=90;i<100;i++){
+		if(id[i]==0)
+			return 1;
 	}
-	return 1;
+	for(int i=90;i<100;i++)
+		cout<<i<<":"<<id[i]<<" ";
+	cout<<endl;
+	return 0;
 }
 
 void calculate(){
-	long long sum;
-	for(long long i=0;i<1000000;i++){
+	cout<<"calculate"<<endl;
+	long long sum=0;
+	for(int i=0;i<2;i++){
 		sum+=num[i];
 	}
-	double ans = sum/1000000.0;
-	cout<<ans<<endl;
+	cout<<sum/2<<endl;
 }
 
-int monte_carlo() {srand((unsigned)time(0)); 
-    return rand()%10000; 
+int monte_carlo() {
+	cout<<"random"<<endl;
+	srand((unsigned)time(0));
+	int i = rand()%100;
+    return i;
 }
 
 void color(){
+	cout<<"color"<<endl;
 	int flag= monte_carlo();
 	while(tf[flag]){
 		flag = monte_carlo();
 	}
+//	int flag=0;
+//	while(tf[flag])flag++;
+	cout<<"flag="<<flag<<endl;
 	tf[flag]=1;
-	weighted-QU(flag);
+	weightedQU(flag);
 }
 
 int test(){
-	int count=0;//´ÎÊı 
+	cout<<"test"<<endl;
+	init();
+	int count=0;//æ¬¡æ•° 
 	while(1){
 		if(judgement()){
 			return count;
@@ -81,7 +143,8 @@ int test(){
 
 int main(){
 	long long i=0;
-	while(i<1000000){
+	while(i<2){
+		cout<<i<<endl;
 		num.push_back(test());
 		i++;
 	}
