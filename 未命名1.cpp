@@ -5,6 +5,18 @@
 #include <algorithm>
 using namespace std;
 
+//int main(){
+//	vector<int>p;
+//	for(int i=0;i<100;i++){
+//		p.push_back(i+1);
+//	}
+//	random_shuffle(p.begin(),p.end());
+//	for(int i=0;i<100;i++){
+//		cout<<p[i]<<" ";
+//	}
+//}
+ 
+
 vector<int>num;
 int g_is_first = 1; 
 int id[100];//假定0-9为最上面一行，90-99为最后一行 
@@ -108,24 +120,33 @@ void calculate(){
 	cout<<sum/2<<endl;
 }
 
-int monte_carlo() {
-	cout<<"random"<<endl;
-	srand((unsigned)time(0));
-	int i = rand()%100;
-    return i;
-}
+//int monte_carlo() {
+//	cout<<"random"<<endl;
+//	srand((unsigned)time(0));
+//	int i = rand()%100;
+//    return i;
+//}
 
 void color(){
 	cout<<"color"<<endl;
-	int flag= monte_carlo();
-	while(tf[flag]){
-		flag = monte_carlo();
+	vector<int>aaa;
+	for(int i=0;i<100;i++){
+		aaa.push_back(i+1);
 	}
+	random_shuffle(aaa.begin(),aaa.end());
+//	int flag= monte_carlo();
+//	while(tf[flag]){
+//		flag = monte_carlo();
+//	}
 //	int flag=0;
 //	while(tf[flag])flag++;
-	cout<<"flag="<<flag<<endl;
-	tf[flag]=1;
-	weightedQU(flag);
+//	cout<<"flag="<<flag<<endl;
+	for(int i=0;i<100;i++){
+		int flag=aaa[i];
+		tf[flag]=1;
+		weightedQU(flag);
+	}
+	
 }
 
 int test(){
