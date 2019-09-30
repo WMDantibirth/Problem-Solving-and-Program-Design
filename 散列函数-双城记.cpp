@@ -1,18 +1,18 @@
 #include <iostream>
-#include <functional>
 #include <string>
 #include <vector>
 #include <fstream>
+#include <list>
+#include <ctime>
+#define hash_number 97
 using namespace std;
 
-struct ha{
-	long long word[100];
-};
+vector<list<string>>hash_table(hash_number);
+vector<unsigned long long>words;
+vector<string>dict;
 
-vector<long long>words;
-
-long long po(int up,int down){
-	long long out=1;
+unsigned long long po(int up,int down){
+	unsigned long long out=1;
 	while(up){
 		out*=down;
 		up--; 
@@ -20,13 +20,20 @@ long long po(int up,int down){
 	return out;
 }
 
-void insert(string tmp){
-	long long out=0;
+void insertion(string tmp){
+	unsigned long long out=0;
 	int n=tmp.size()-1;
 	for(int i=0;i<tmp.size();i++){
 		out += (tmp[i]-'a'+1)*po(n,26);
 	}
 	words.push_back(out);
+	bool tag=1;
+	for(auto i=hash_table[out%hash_number].begin();i!=hash_table[out%hash_number].end();i++){
+		if(*i==tmp){
+			tag=0;break;
+		}
+	}
+	if(tag) hash_table[out%hash_number].push_back(tmp);
 }
 
 void init(){
@@ -38,29 +45,59 @@ void init(){
 		for(int i=0;i<line.size();i++){
 			if(line[i]>='a' && line[i]<= 'z')tmp.push_back(line[i]);
 			else if(line[i]>='A' && line[i]<= 'Z')tmp.push_back(line[i]+'a'-'A');
-			else{
-				insert(tmp);
+			else if(tmp!=""){
+				insertion(tmp);
 				tmp="";
 			}
 		}
 		if(tmp != ""){
-			insert(tmp);
+			insertion(tmp);
 			tmp="";
 		}
 	}
 }
 
-void ha_sh(){
-	for(int i=0;i<words.size();i++){
-		cout<<words[i]%97<<"\t";
+bool searching(string tmp){
+	unsigned long long out=0;
+	int n=tmp.size()-1;
+	for(int i=0;i<tmp.size();i++){
+		out += (tmp[i]-'a'+1)*po(n,26);
 	}
+	int ha=out%hash_number;
+	bool flag=0;
+	for(auto i=hash_table[ha].begin();i!=hash_table[ha].end();i++){
+		if(*i==tmp)flag=1;
+	}
+	return flag;
+}
+
+void search_init(){
+	ifstream dictionary;
+	dictionary.open("dictionary.txt");
+	string tmp;
+	while(dictionary>>tmp)
+		dict.push_back(tmp);
 }
 
 int main(){
-	ha _hash[100]={0};
 	init();
-//	ha_sh();
-cout<<words.size();
+//	cout<<words.size()<<endl;
+//	for(int i=0;i<hash_number;i++){
+//		cout<<hash_table[i].size()<<endl;
+//	}
+	search_init();
+	srand(time(0));
+	clock_t start,end;
+	start=clock();
+	for(int i=0;i<100000;i++){
+	string rand_word = dict[rand()%dict.size()];
+//	cout<<rand_word<<endl;
+	searching(rand_word);
+//	if(searching(rand_word))cout<<"Yes\n";
+//	else cout<<"No\n";
+	}
+	end=clock();
+	double average = (end-start)/100000.0;
+	cout<<"The average time of each search is "<<average<<"ms."<<endl;
 	return 0;
 }
-
