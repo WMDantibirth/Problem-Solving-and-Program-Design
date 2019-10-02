@@ -1,5 +1,4 @@
 #include <iostream>
-#define N 10000
 using namespace std;
 
 enum RBTColor{RED, BLACK};
@@ -47,17 +46,16 @@ public:
     };
 
     // 查询是否在区间中
-    bool search_range(int key){
-        bool flag = true;
+    RBTNode* search_range(int key){
         RBTNode *node=mroot;
-        while(flag && node != nullptr){
+        while(node != nullptr){
             if (node->low > key)
                 node = node->left;
             else if (node->high < key)
                 node = node->right;
-            else flag = false;
+            else return node;
         }
-        return !flag;
+        return node;
     }
 
 //        // 删除结点(key为节点键值)
@@ -118,20 +116,20 @@ private:
     // 右旋
     void rightRotate(RBTNode* &root, RBTNode* y){
         RBTNode *x = y->left;
-        x->right = y->left;
+        y->left = x->right;
         if(x->right != nullptr)
             x->right->parent = y;
+        x->parent = y->parent;
         if(y->parent == nullptr)
             root = x;
         else{
-            if(y->parent->left == y)
-                y->parent->left = x;
-            else
+            if(y->parent->right == y)
                 y->parent->right = x;
+            else
+                y->parent->left = x;
         }
-        x->parent = y->parent;
-        y->parent=x;
         x->right=y;
+        y->parent=x;
     };
     // 插入函数
     void insert(RBTNode* &root, RBTNode* node){
@@ -226,8 +224,11 @@ int main(){
     tree.insert(5532, 7643);
     tree.insert(8999, 10332);
     tree.insert(5666653, 5669321);
-    if (tree.search_range(8122)) cout<<"YES"<<endl;
+    RBTNode* answer = tree.search_range(9122);
+    if (answer != nullptr) {
+        cout<<"Yes"<<endl;
+        cout<<"Range is: ["<<answer->low<<", "<<answer->high<<"]\n";
+    }
     else cout<<"No"<<endl;
     return 0;
 }
-
